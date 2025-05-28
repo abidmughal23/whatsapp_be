@@ -2,7 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
 import helmet from 'helmet';
-import MongoSanitize from 'express-mongo-sanitize';
+import mongoSanitize from 'express-mongo-sanitize';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import fileUpload from 'express-fileupload';
@@ -28,7 +28,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Sanitization middleware to prevent NoSQL injection attacks
-app.use(MongoSanitize());
+app.use((req, res, next) => {
+  if (req.body) mongoSanitize.sanitize(req.body);
+  if (req.params) mongoSanitize.sanitize(req.params);
+  if (req.query) mongoSanitize.sanitize(req.query); // Only sanitizes, doesn't reassign
+  next();
+});
 
 // Middleware to parse cookies
 app.use(cookieParser());

@@ -8,6 +8,7 @@ import compression from 'compression';
 import fileUpload from 'express-fileupload';
 import cors from 'cors';
 import createHttpError from 'http-errors';
+import router from './routes/index.routes.js';
 
 dotenv.config(); 
 
@@ -49,6 +50,10 @@ app.use(fileUpload({
 
 // CORS middleware to allow cross-origin requests
 app.use(cors());
+
+// Mounting the main router for handling routes
+app.use('/api/v1', router);
+
 
 app.post('/test', (req, res) => {
   throw createHttpError.BadRequest('This is a test error'); // Example route to test error handling

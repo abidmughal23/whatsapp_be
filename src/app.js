@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import fileUpload from 'express-fileupload';
 import cors from 'cors';
+import createHttpError from 'http-errors';
 
 dotenv.config(); 
 
@@ -50,7 +51,23 @@ app.use(fileUpload({
 app.use(cors());
 
 app.post('/test', (req, res) => {
-  res.send(req.body);
+  throw createHttpError.BadRequest('This is a test error'); // Example route to test error handling
 });
+
+app.use((req, res, next) => {
+  // Handle 404 errors
+  next(createHttpError.NotFound('This route does not exist'));
+});
+
+// Middleware to handle 404 errors
+app.use(async(err, req, res, next) => {
+  res.status(err.status || 500);
+  res.send({
+    error:{
+      status: err.status || 500,
+      message: err.message || 'Internal Server Error',
+    }
+  })
+})
 
 export default app;
